@@ -13,14 +13,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class JavaFilterExampleTest {
+public class MMDBTest {
 
     @Test
     public void testJavaExampleFilter() {
         String sourceField = "foo";
         Configuration config = new ConfigurationImpl(Collections.singletonMap("source", sourceField));
         Context context = new ContextImpl(null, null);
-        JavaFilterExample filter = new JavaFilterExample("test-id", config, context);
+        MMDB filter = new MMDB("test-id", config, context);
 
         Event e = new org.logstash.Event();
         TestMatchListener matchListener = new TestMatchListener();

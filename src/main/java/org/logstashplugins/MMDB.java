@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 // class name must match plugin name
-@LogstashPlugin(name = "java_filter_example")
-public class JavaFilterExample implements Filter {
+@LogstashPlugin(name = "mmdb")
+public class MMDB implements Filter {
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG =
             PluginConfigSpec.stringSetting("source", "message");
@@ -22,7 +22,7 @@ public class JavaFilterExample implements Filter {
     private String id;
     private String sourceField;
 
-    public JavaFilterExample(String id, Configuration config, Context context) {
+    public MMDB(String id, Configuration config, Context context) {
         // constructors should validate configuration options
         this.id = id;
         this.sourceField = config.get(SOURCE_CONFIG);
