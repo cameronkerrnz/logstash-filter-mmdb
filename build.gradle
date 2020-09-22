@@ -50,6 +50,8 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-core:2.9.1'
     compile fileTree(dir: LOGSTASH_CORE_PATH, include: "build/libs/logstash-core-?.?.?.jar")
 
+    compile 'com.maxmind.db:maxmind-db:1.4.0'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.jruby:jruby-complete:9.2.7.0'
 }
