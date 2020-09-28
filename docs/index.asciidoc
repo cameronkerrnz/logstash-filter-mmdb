@@ -38,6 +38,75 @@ You, as the MMDB database creator, are in total control of what goes into the MM
 fairly easy programming, which might involve interacting with a SOAP or REST API, or extracting data from a Spreadsheet; Python is a great tool for this job, but you can
 use whatever you are comfortable with.
 
+==== Sample Configuration
+
+A useful Logstash filter configuration would look something like the following:
+
+```
+filter {
+    mmdb {
+        source => "ip"
+        target => "ipinfo"
+        database => "/path/to/demo.mmdb"
+        fields => ["subnet", "name", "vlan_id"]
+    }
+}
+```
+
+Let's assume that you have created a MMDB file using
+https://github.com/cameronkerrnz/json-to-mmdb[json-to-mmdb], and the input
+for that looked like the following:
+
+```
+{
+    "schema": {
+        "database_type": "demo-network",
+        "description": { "en": "Demo network allocations" },
+        "ip_version": 4,
+        "types": {
+            "vlan_id": "uint32",
+            "name": "utf8_string",
+            "campus": "utf8_string"
+        }
+    },
+    "allocations": [
+        {
+            "subnet": "10.10.0.0/16",   <--- REQUIRED FIELD
+            "name": "Datacenter range",
+            "campus": "Head Office"
+        },
+        {
+            "subnet": "10.10.0.0/20",
+            "vlan_id": 1,
+            "name": "Management interfaces",
+            "campus": "Head Office"
+        },
+        ...
+```
+
+Then an event such as the following (expressed as JSON)...
+
+```
+{
+    "ip":"10.10.1.123",
+    "message":"configuration changed"
+}
+```
+
+...will result in the following output (expressed as JSON)...
+
+```
+{
+    "ip":"10.10.1.123",
+    "ipinfo": {
+        "name": "Management interfaces",
+        "vlan_id": 1,
+        "subnet": "10.10.0.0/20"
+    },
+    "message":"configuration changed"
+}
+```
+
 // Format anchors and links to support generated ids for versioning
 // Sample anchor: [id="plugins-{type}s-{plugin}-setting_name"]
 // Sample link: <<plugins-{type}s-{plugin}-setting_name>>
