@@ -207,6 +207,78 @@ public class MMDBTest {
         }
     }
 
+    @Test
+    public void testDemoFields() {
+        
+        HashMap configMap = new HashMap();
+        configMap.put("source", "ip");
+        configMap.put("target", "info");
+        configMap.put("database", "samples/demo.mmdb");
+        List configFields = new ArrayList<String>();
+        configFields.add("name");
+        configFields.add("vlan_id");
+        configMap.put("fields", configFields);
+        Configuration config = new ConfigurationImpl(configMap);
+        Context context = new ContextImpl(null, null);
+        MMDB filter = new MMDB("test-id", config, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        e.setField("ip", "172.16.0.1");
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        assertNull(e.getField("tags"));
+        assertThat(e.getField("[ip]"), is("172.16.0.1"));
+        assertNull(e.getField("[info][subnet]"));
+        assertThat(e.getField("[info][name]"), is("DMZ"));
+        assertThat(e.getField("[info][vlan_id]"), is(234L));
+    }
+
+    @Test
+    public void testDemoFieldsWithInvalid() {
+        
+        HashMap configMap = new HashMap();
+        configMap.put("source", "ip");
+        configMap.put("target", "info");
+        configMap.put("database", "samples/demo.mmdb");
+        List configFields = new ArrayList<String>();
+        configFields.add("name");
+        configFields.add(123);
+        configMap.put("fields", configFields);
+        Configuration config = new ConfigurationImpl(configMap);
+        Context context = new ContextImpl(null, null);
+
+        try {
+            MMDB filter = new MMDB("test-id", config, context);
+            fail("Expected an exception to be thrown");
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), is("Fields config must only be a list of strings"));
+        }
+    }
+
+    @Test
+    public void testDemoFieldsEmpty() {
+        
+        HashMap configMap = new HashMap();
+        configMap.put("source", "ip");
+        configMap.put("target", "info");
+        configMap.put("database", "samples/demo.mmdb");
+        List configFields = new ArrayList<String>();
+        configMap.put("fields", configFields);
+        Configuration config = new ConfigurationImpl(configMap);
+        Context context = new ContextImpl(null, null);
+        MMDB filter = new MMDB("test-id", config, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        e.setField("ip", "172.16.0.1");
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        assertNull(e.getField("tags"));
+        assertThat(e.getField("[ip]"), is("172.16.0.1"));
+        assertNull(e.getField("[info]"));
+    }
+
 }
 
 class TestMatchListener implements FilterMatchListener {

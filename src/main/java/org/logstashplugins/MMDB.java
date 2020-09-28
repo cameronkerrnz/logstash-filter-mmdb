@@ -9,10 +9,12 @@ import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -39,6 +41,8 @@ public class MMDB implements Filter {
             PluginConfigSpec.requiredStringSetting("database");
     public static final PluginConfigSpec<Long> CACHE_SIZE_CONFIG =
             PluginConfigSpec.numSetting("cache_size", 4096L);
+    public static final PluginConfigSpec<List<Object>> FIELDS_CONFIG =
+            PluginConfigSpec.arraySetting("fields");
     
     private String id;
     private String sourceField;
@@ -46,6 +50,7 @@ public class MMDB implements Filter {
     private Reader databaseReader;
     private String databaseFilename;
     private String failureTag = "_mmdb_lookup_failure";
+    private List<String> fields;
 
     private NodeCache cache;
 
@@ -55,7 +60,8 @@ public class MMDB implements Filter {
         this.sourceField = config.get(SOURCE_CONFIG);
         this.targetField = config.get(TARGET_CONFIG);
         this.databaseFilename = config.get(DATABASE_FILENAME_CONFIG);
-        
+        this.fields = null; // null = all fields to be exported
+
         if (this.databaseFilename == null) {
             throw new IllegalStateException("Must specify database filename");
         }
@@ -66,6 +72,18 @@ public class MMDB implements Filter {
 
         if (this.targetField == null) {
             throw new IllegalStateException("Must specify target field");
+        }
+
+        List<Object> fieldsTmp = config.get(FIELDS_CONFIG);
+        if (fieldsTmp != null) {
+            this.fields = new ArrayList<String>();
+            for (Object o : fieldsTmp) {
+                if (o instanceof String) {
+                    this.fields.add( (String) o );
+                } else {
+                    throw new IllegalStateException("Fields config must only be a list of strings");
+                }
+            }
         }
 
         if (config.get(CACHE_SIZE_CONFIG) > 0L) {
@@ -102,6 +120,12 @@ public class MMDB implements Filter {
     ) {
         while (fields.hasNext()) {
             Map.Entry<String,JsonNode> field = fields.next();
+
+            if (this.fields != null) {
+                if (! this.fields.contains(field.getKey())) {
+                    continue;
+                }
+            }
 
             String key = "[" + this.targetField + "][" + field.getKey() + "]";
 
@@ -162,7 +186,8 @@ public class MMDB implements Filter {
             SOURCE_CONFIG,
             TARGET_CONFIG,
             DATABASE_FILENAME_CONFIG,
-            CACHE_SIZE_CONFIG);
+            CACHE_SIZE_CONFIG,
+            FIELDS_CONFIG);
     }
 
     @Override
