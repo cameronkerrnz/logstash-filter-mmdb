@@ -7,7 +7,6 @@ import co.elastic.logstash.api.Filter;
 import co.elastic.logstash.api.FilterMatchListener;
 import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -20,6 +19,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.maxmind.db.Reader;
 import com.maxmind.db.Record;
 import com.maxmind.db.Metadata;
+import com.maxmind.db.CHMCache;
+import com.maxmind.db.NoCache;
+import com.maxmind.db.NodeCache;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,18 +32,22 @@ import java.net.InetAddress;
 public class MMDB implements Filter {
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG =
-            PluginConfigSpec.stringSetting("source", "message");
+            PluginConfigSpec.requiredStringSetting("source");
     public static final PluginConfigSpec<String> TARGET_CONFIG =
-            PluginConfigSpec.stringSetting("target", "mmdb");
+            PluginConfigSpec.requiredStringSetting("target");
     public static final PluginConfigSpec<String> DATABASE_FILENAME_CONFIG =
-            PluginConfigSpec.stringSetting("database", null);
-
+            PluginConfigSpec.requiredStringSetting("database");
+    public static final PluginConfigSpec<Long> CACHE_SIZE_CONFIG =
+            PluginConfigSpec.numSetting("cache_size", 4096L);
+    
     private String id;
     private String sourceField;
     private String targetField;
     private Reader databaseReader;
     private String databaseFilename;
     private String failureTag = "_mmdb_lookup_failure";
+
+    private NodeCache cache;
 
     public MMDB(String id, Configuration config, Context context) {
         // constructors should validate configuration options
@@ -53,10 +59,26 @@ public class MMDB implements Filter {
         if (this.databaseFilename == null) {
             throw new IllegalStateException("Must specify database filename");
         }
+        
+        if (this.sourceField == null) {
+            throw new IllegalStateException("Must specify source field");
+        }
+
+        if (this.targetField == null) {
+            throw new IllegalStateException("Must specify target field");
+        }
+
+        if (config.get(CACHE_SIZE_CONFIG) > 0L) {
+            this.cache = new CHMCache(config.get(CACHE_SIZE_CONFIG).intValue());
+        } else if (config.get(CACHE_SIZE_CONFIG) == 0L) {
+            this.cache = NoCache.getInstance();
+        } else {
+            throw new IllegalStateException("Cache size must be either >0 to use a cache, or =0 to use no cache");
+        }
 
         File databaseFile = new File(this.databaseFilename);
         try {
-            this.databaseReader = new Reader(databaseFile); // with no caching (FIXME)
+            this.databaseReader = new Reader(databaseFile, cache);
         } catch (java.io.IOException ex) {
             throw new IllegalStateException("Database does not appear to be a valid database");
         }
@@ -139,7 +161,8 @@ public class MMDB implements Filter {
         return Arrays.asList(
             SOURCE_CONFIG,
             TARGET_CONFIG,
-            DATABASE_FILENAME_CONFIG);
+            DATABASE_FILENAME_CONFIG,
+            CACHE_SIZE_CONFIG);
     }
 
     @Override
