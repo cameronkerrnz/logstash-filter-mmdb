@@ -7,6 +7,7 @@ import co.elastic.logstash.api.Filter;
 import co.elastic.logstash.api.FilterMatchListener;
 import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
+import co.elastic.logstash.api.PluginHelper;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -181,13 +182,27 @@ public class MMDB implements Filter {
 
     @Override
     public Collection<PluginConfigSpec<?>> configSchema() {
-        // should return a list of all configuration options for this plugin
-        return Arrays.asList(
-            SOURCE_CONFIG,
-            TARGET_CONFIG,
-            DATABASE_FILENAME_CONFIG,
-            CACHE_SIZE_CONFIG,
-            FIELDS_CONFIG);
+        
+        // The Java example I was looking at doesn't tell
+        // you that you need to include the common config
+        // too, nor does it show how.
+        // 
+        // This form of commonFilterSettings, with an
+        // argument, will merge the provided settings with
+        // the common ones for filter.
+        //
+        // Note that the checking of arguments is not done
+        // when we run the unit-tests; that's not our
+        // code. You may therefore encounter this during
+        // integration testing instead.
+
+        return PluginHelper.commonFilterSettings(
+            Arrays.asList(
+                SOURCE_CONFIG,
+                TARGET_CONFIG,
+                DATABASE_FILENAME_CONFIG,
+                CACHE_SIZE_CONFIG,
+                FIELDS_CONFIG));
     }
 
     @Override
