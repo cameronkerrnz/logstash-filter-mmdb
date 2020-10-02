@@ -1,0 +1,22 @@
+FROM docker.elastic.co/logstash/logstash-oss:7.9.1
+
+USER root
+RUN yum install -y -q python3 python3-pip; \
+    rm -rf /var/cache/yum
+
+# Back to what was used in parent image
+USER 1000
+
+RUN pip3 install --user requests colorama
+
+COPY *.gem /qa/gems/
+RUN logstash-plugin install /qa/gems/logstash-filter-mmdb-1.0.0.gem
+
+
+RUN rm -f /usr/share/logstash/pipeline/logstash.conf
+COPY qa/pipeline/ /usr/share/logstash/pipeline/
+COPY qa/inputs/ /qa/inputs/
+COPY qa/scripts/ /qa/scripts/
+COPY samples /qa/samples/
+ENTRYPOINT ["/qa/scripts/entrypoint.sh"]
+CMD ["/qa/inputs/demo.sh"]
