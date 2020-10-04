@@ -9,8 +9,7 @@
 
 trap 'exit 0' SIGTERM
 
-while true
+while awk '{ for (i=0; i<$2; i++) { print $1 } }' /qa/inputs/demo-not-found.in | shuf
 do
-    awk '{ for (i=0; i<$2; i++) { print $1 } }' \
-        /qa/inputs/demo-not-found.in | shuf
-done </dev/null | head -n 1000000
+    : # don't actually have anything to do; we just need to loop until awk fails due because our stdout gets closed
+done

@@ -19,4 +19,4 @@ COPY qa/inputs/ /qa/inputs/
 COPY qa/scripts/ /qa/scripts/
 COPY samples /qa/samples/
 ENTRYPOINT ["/qa/scripts/entrypoint.sh"]
-CMD ["/qa/inputs/demo.sh"]
+CMD []
