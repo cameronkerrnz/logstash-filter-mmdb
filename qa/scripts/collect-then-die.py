@@ -24,7 +24,7 @@ for line in fileinput.input():
         # For a spot check, emit this record also
         print(colorama.Style.DIM + line.strip() + colorama.Style.NORMAL)
 
-    if nr % 100_000 == 0:
+    if nr % 20_000 == 0:
         # Time to collect statistics
 
         resp = requests.get("http://127.0.0.1:9600/_node/stats/pipelines?pretty")

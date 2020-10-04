@@ -156,13 +156,13 @@ public class MMDBTest {
     }
 
     @Test
-    public void testDemoNoCache() {
+    public void testDemoCache() {
         
         HashMap configMap = new HashMap();
         configMap.put("source", "ip");
         configMap.put("target", "info");
         configMap.put("database", "samples/demo.mmdb");
-        configMap.put("cache_size", 0L);
+        configMap.put("cache_size", 1024L);
         Configuration config = new ConfigurationImpl(configMap);
         Context context = new ContextImpl(null, null);
         MMDB filter = new MMDB("test-id", config, context);

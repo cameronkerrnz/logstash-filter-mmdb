@@ -5,7 +5,9 @@ for sharing publicly.
 
 Depending on your use-case you may prefer to obtain sample data in a variety of
 ways; one thing to consider is the effect on IP locality and the liklihood of a
-cache hit. Behaviour will likely be quite different when querying client IPs
+cache hit (although the cache is not enabled by default, as performance testing
+indicated it does not have a payoff).
+Behaviour will likely be quite different when querying client IPs
 from a public website compared to syslog traffic inside a datacentre where most
 things will have either a private address range or appear in a small range of
 public addresses.

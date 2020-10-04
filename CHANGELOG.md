@@ -1,3 +1,7 @@
+## 1.0.1
+- Disabled cache by default as it was shown not to result in any
+  performance gain on a production dataset.
+
 ## 1.0.0
 - Updated for GA release of native support for Java plugins. Includes:
   - Improved Gradle task wrappers

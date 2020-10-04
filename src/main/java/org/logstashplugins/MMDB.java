@@ -41,7 +41,7 @@ public class MMDB implements Filter {
     public static final PluginConfigSpec<String> DATABASE_FILENAME_CONFIG =
             PluginConfigSpec.requiredStringSetting("database");
     public static final PluginConfigSpec<Long> CACHE_SIZE_CONFIG =
-            PluginConfigSpec.numSetting("cache_size", 4096L);
+            PluginConfigSpec.numSetting("cache_size", 0L);
     public static final PluginConfigSpec<List<Object>> FIELDS_CONFIG =
             PluginConfigSpec.arraySetting("fields");
     

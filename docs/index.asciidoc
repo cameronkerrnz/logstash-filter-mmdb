@@ -154,7 +154,9 @@ Points to the MMDB database you provide.
 ===== `cache_size` 
 
   * Value type is <<number,number>>
-  * Default value is `4096` (which is different to <<plugins-filters-geoip-cache_size>>)
+  * Default value is `0` (which is different to <<plugins-filters-geoip-cache_size>>).
+    Performance testing on a production dataset indicated adding the cache did not
+    add any performance gain.
 
 Add description here
 
