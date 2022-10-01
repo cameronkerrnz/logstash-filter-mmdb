@@ -17,10 +17,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.maxmind.db.Reader;
-import com.maxmind.db.Record;
+import com.maxmind.db.DatabaseRecord;
 import com.maxmind.db.Metadata;
 import com.maxmind.db.CHMCache;
 import com.maxmind.db.NoCache;
@@ -115,12 +113,11 @@ public class MMDB implements Filter {
     // This assumes that the fields in the MMDB are a flat structure
     // AND only contain either numbers or strings
     //
-    private void renderJsonNodeIntoEvent(
-        Iterator<Map.Entry<String,JsonNode>> fields,
+    private void renderMapIntoEvent(
+        Map<String, Object> fields,
         Event e
     ) {
-        while (fields.hasNext()) {
-            Map.Entry<String,JsonNode> field = fields.next();
+        for (Map.Entry<String, Object> field : fields.entrySet()) {
 
             if (this.fields != null) {
                 if (! this.fields.contains(field.getKey())) {
@@ -130,22 +127,25 @@ public class MMDB implements Filter {
 
             String key = "[" + this.targetField + "][" + field.getKey() + "]";
 
-            switch (field.getValue().getNodeType()) {
+            if (field.getValue() instanceof String) {
+                e.setField(key, (String) field.getValue());
+            }
+            
+            else if (field.getValue() instanceof Long) {
+                e.setField(key, (Long) field.getValue());
+            }
+            
+            else if (field.getValue() instanceof Float) {
+                e.setField(key, (Float) field.getValue());
+            }
 
-                // https://fasterxml.github.io/jackson-databind/javadoc/2.8/com/fasterxml/jackson/databind/node/JsonNodeType.html
+            else if (field.getValue() instanceof Boolean) {
+                e.setField(key, (Boolean) field.getValue());
+            }
 
-                case STRING:
-                    e.setField(key, field.getValue().textValue());
-                    break;
-
-                case NUMBER:
-                    // This could be a short, int, long, float, double or bignum etc.
-                    // Conversion will depend on what Logstash does
-                    e.setField(key, field.getValue().numberValue());
-                    break;
-
-                default:
-                    e.tag(this.failureTag);
+            // FIXME: Should we support lists and objects?
+            else {
+                e.tag(this.failureTag);
             }
         }
     }
@@ -154,18 +154,18 @@ public class MMDB implements Filter {
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
         for (Event e : events) {
             try {
-                JsonNode recordData = this.databaseReader.get(
+                @SuppressWarnings("unchecked")
+                Map<String,Object> recordData = this.databaseReader.get(
                     InetAddress.getByName(
-                        e.getField(this.sourceField).toString()));
+                        e.getField(this.sourceField).toString()),
+                    Map.class);
 
                 if (null == recordData) {
                     e.tag(this.failureTag);
                     continue;
                 }
 
-                Iterator<Map.Entry<String,JsonNode>> fields = recordData.fields();
-
-                renderJsonNodeIntoEvent(fields, e);
+                renderMapIntoEvent(recordData, e);
 
                 matchListener.filterMatched(e);
 
