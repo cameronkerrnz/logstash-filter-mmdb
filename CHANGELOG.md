@@ -1,3 +1,9 @@
+## 1.0.2
+- Update build to work with newer Logstash (tested with 7.17)
+  - Updated for newer gradle
+  - Modeled configuration from logstash-input-example_java_plugin
+- No functional changes
+
 ## 1.0.1
 - Disabled cache by default as it was shown not to result in any
   performance gain on a production dataset.

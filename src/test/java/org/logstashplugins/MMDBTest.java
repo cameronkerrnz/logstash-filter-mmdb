@@ -7,6 +7,8 @@ import co.elastic.logstash.api.FilterMatchListener;
 import org.logstash.plugins.ConfigurationImpl;
 import org.logstash.plugins.ContextImpl;
 
+import org.logstashplugins.MMDB;
+
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
