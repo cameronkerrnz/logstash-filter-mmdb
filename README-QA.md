@@ -56,7 +56,14 @@ Or you provide the input data (IPs and MMDB) as mapped into the container:
 PS> docker run --name qa --rm -it `
     -v ${PWD}/../private-test-data:/qa/inputs `
     logstash-filter-mmdb:qa `
-    /qa/inputs/ip-sampling.log /qa/inputs/uoo-addressing.mmdb
+    /qa/inputs/ip-sampling.log /qa/inputs/my-addressing.mmdb
+```
+
+If you don't have any demo logs or database, a simple one will
+be provided:
+
+```
+docker run --name qa --rm -it logstash-filter-mmdb:qa
 ```
 
 The key lines of output will the ones that look like the following:

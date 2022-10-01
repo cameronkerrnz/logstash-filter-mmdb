@@ -6,6 +6,7 @@ RUN set -eu ; \
     apt-get install -y python3-requests python3-colorama; \
     apt-get clean
 
+RUN mkdir /qa && chown 1000:1000 /qa
 # Back to what was used in parent image
 USER 1000
 
