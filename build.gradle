@@ -51,8 +51,8 @@ dependencies {
     // because in MMDB we get the logger, so we need this in the
     // test harness.
     //
-    implementation 'org.apache.logging.log4j:log4j-api:2.17.0' // provided by Logstash
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.0' // provided by Logstash
+    implementation 'org.apache.logging.log4j:log4j-api:2.17.1' // provided by Logstash
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.1' // provided by Logstash
 
     implementation fileTree(dir: LOGSTASH_CORE_PATH, include: "**/logstash-core.jar")
     implementation 'com.maxmind.db:maxmind-db:1.4.0'
