@@ -1,3 +1,7 @@
+## 2.0.0
+- Updated MaxMindDBReader to 2.0.0 to remove vulnerability due on jackson-databind
+  - now required Java 8
+
 ## 1.0.2
 - Update build to work with newer Logstash (tested with 7.17)
   - Updated for newer gradle
