@@ -1,3 +1,9 @@
+# ARCHIVED
+
+I am not in a position to maintain this as frequently as I would have liked, and my logstash work required a lot of updating for Logstash 8 than I had time for, so I've made the decision to archive this project. It was last known to work with Logstash 7.
+
+I think the idea of this plugin still holds a lot of usefulness, so I'd love it someone could fork it and provide the necessary updates. You'll need to be quite confident in Gradle, Java, Ruby, JRuby.
+
 # Logstash MMDB Plugin
 
 This is a MMDB filter plugin for
